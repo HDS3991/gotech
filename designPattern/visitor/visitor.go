@@ -4,7 +4,7 @@ package visitor
 // 适用于多个 Visitor 是来访问一个数据结构的不同部分
 优点：
 1.解耦了数据和逻辑；
-2.用 pipeline 使逻辑清晰已读
+2.用 pipeline 使逻辑清晰易读
 */
 
 type Info struct {
