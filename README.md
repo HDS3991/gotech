@@ -1,2 +1,3 @@
-# go-techs
-Go technique collection
+# go
+
+Go Backend technique collection
