@@ -1,8 +1,18 @@
+- [Go](#go)
+  - [编程规范](#编程规范)
+    - [代码规范](#代码规范)
+    - [性能优化](#性能优化)
+  - [设计模式](#设计模式)
+
 # Go
 
 Go Backend Technique Collection!
 
 ## 编程规范
+
+### [代码规范](./guide/style.md)
+
+### [性能优化](./guide/optimization.md)
 
 ## 设计模式
 

@@ -9,6 +9,14 @@
     - [单元测试](#单元测试)
     - [类型断言](#类型断言)
   - [命名规范](#命名规范)
+    - [包命名](#包命名)
+    - [函数命名](#函数命名)
+    - [文件命名](#文件命名)
+    - [结构体命名](#结构体命名)
+    - [接口命名](#接口命名)
+    - [变量命名](#变量命名)
+    - [常量命名](#常量命名)
+    - [Error 命名](#error-命名)
   - [注释规范](#注释规范)
   - [数据类型使用规范](#数据类型使用规范)
   - [控制结构](#控制结构)
@@ -542,6 +550,165 @@
   </table>
 
 ## 命名规范
+
+### 包命名
+
+- 包名必须和目录名一致，尽量采取有意义、简短的包名，不要和标准库冲突。
+- 包名全部小写，没有大写或下划线，使用多级目录来划分层级。
+- 项目名可以通过中划线来连接多个单词。
+- 包名以及包所在的目录名，不要使用复数，例如，是 net/url，而不是 net/urls。
+- 不要用 common、util、shared 或者 lib 这类宽泛的、无意义的包名。
+- 包名要简单明了，例如 net、time、log。
+
+### 函数命名
+
+- 函数名采用驼峰式，首字母根据访问控制决定使用大写或小写，例如：MixedCaps 或者 mixedCaps。
+- 代码生成工具自动生成的代码 (如 xxxx.pb.go) 和为了对相关测试用例进行分组，而采用的下划线 (如 TestMyFunction_WhatIsBeingTested) 排除此规则。
+
+### 文件命名
+
+- 文件名要简短有意义。
+- 文件名应小写，并使用下划线分割单词。
+
+### 结构体命名
+
+- 采用驼峰命名方式，首字母根据访问控制决定使用大写或小写，例如 MixedCaps 或者 mixedCaps。
+- 结构体名不应该是动词，应该是名词，比如 Node、NodeSpec。
+- 避免使用 Data、Info 这类无意义的结构体名。
+- 结构体的声明和初始化应采用多行，例如：
+
+  ```go
+
+    type User struct {
+      Name string
+      Email string
+    }
+    // 多行初始化
+    u := User{
+      UserName: "colin",
+      Email: "colin404@foxmail.com",
+    }
+
+  ```
+
+### 接口命名
+
+- 接口命名的规则，基本和结构体命名规则保持一致：
+
+  - 单个函数的接口名以 “er"”作为后缀（例如 Reader，Writer），有时候可能导致蹩脚的英文，但是没关系。
+  - 两个函数的接口名以两个函数名命名，例如 ReadWriter。
+  - 三个以上函数的接口名，类似于结构体名。
+
+  ```go
+
+    type Seeker interface {
+        Seek(offset int64, whence int) (int64, error)
+    }
+
+    type ReadWriter interface {
+      Reader
+      Writer
+    }
+
+  ```
+
+### 变量命名
+
+- 变量名必须遵循驼峰式，首字母根据访问控制决定使用大写或小写。
+- 在相对简单（对象数量少、针对性强）的环境中，可以将一些名称由完整单词简写为单个字母，例如：
+  - user 可以简写为 u；
+  - userID 可以简写 uid。
+- 特有名词时，需要遵循以下规则：
+
+  - 如果变量为私有，且特有名词为首个单词，则使用小写，如 apiClient。
+  - 其他情况都应当使用该名词原有的写法，如 APIClient、repoID、UserID。
+
+  ```go
+
+  // 一些常见的特有名词
+  var LintGonicMapper = GonicMapper{
+      "API":   true,
+      "ASCII": true,
+      "CPU":   true,
+      "CSS":   true,
+      "DNS":   true,
+      "EOF":   true,
+      "GUID":  true,
+      "HTML":  true,
+      "HTTP":  true,
+      "HTTPS": true,
+      "ID":    true,
+      "IP":    true,
+      "JSON":  true,
+      "LHS":   true,
+      "QPS":   true,
+      "RAM":   true,
+      "RHS":   true,
+      "RPC":   true,
+      "SLA":   true,
+      "SMTP":  true,
+      "SSH":   true,
+      "TLS":   true,
+      "TTL":   true,
+      "UI":    true,
+      "UID":   true,
+      "UUID":  true,
+      "URI":   true,
+      "URL":   true,
+      "UTF8":  true,
+      "VM":    true,
+      "XML":   true,
+      "XSRF":  true,
+      "XSS":   true,
+  }
+  ```
+
+- 若变量类型为 bool 类型，则名称应以 Has，Is，Can 或 Allow 开头，例如：
+  ```go
+  var hasConflict bool
+  var isExist bool
+  var canManage bool
+  var allowGitHook bool
+  ```
+- 局部变量应当尽可能短小，比如使用 buf 指代 buffer，使用 i 指代 index。
+- 代码生成工具自动生成的代码可排除此规则 (如 xxx.pb.go 里面的 Id)。
+
+### 常量命名
+
+- 常量名必须遵循驼峰式，首字母根据访问控制决定使用大写或小写。
+- 如果是枚举类型的常量，需要先创建相应类型：
+
+  ```go
+
+    type Code int
+
+
+    const (
+        ErrUnknown Code = iota
+        ErrFatal
+    )
+
+  ```
+
+### Error 命名
+
+- Error 类型应该写成 FooError 的形式。
+
+  ```go
+
+  type ExitError struct {
+    // ....
+  }
+
+  ```
+
+- Error 变量写成 ErrFoo 的形式。
+
+  ```go
+
+  var ErrFormat = errors.New("unknown format")
+
+  ```
 
 ## 注释规范
 
