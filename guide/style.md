@@ -18,9 +18,27 @@
     - [常量命名](#常量命名)
     - [Error 命名](#error-命名)
   - [注释规范](#注释规范)
+    - [包注释](#包注释)
+    - [变量 / 常量注释](#变量--常量注释)
+    - [结构体注释](#结构体注释)
+    - [方法注释](#方法注释)
+    - [类型注释](#类型注释)
   - [数据类型使用规范](#数据类型使用规范)
+    - [字符串](#字符串)
+    - [切片](#切片)
+    - [结构体](#结构体)
   - [控制结构](#控制结构)
+    - [if](#if)
+    - [for](#for)
+    - [range](#range)
+    - [switch](#switch)
+    - [goto](#goto)
   - [函数规范](#函数规范)
+    - [函数参数](#函数参数)
+    - [defer](#defer)
+    - [方法的接收器](#方法的接收器)
+    - [嵌套](#嵌套)
+    - [变量命名](#变量命名-1)
 
 ## 代码风格
 
@@ -712,8 +730,628 @@
 
 ## 注释规范
 
+- 每个可导出的名字都要有注释，对导出的变量、函数、结构体、接口等进行简要介绍。
+- 只能使用单行注释，禁止使用多行注释。
+- 单行注释不要过长，禁止超过 120 字符，超过须使用换行展示，尽量保持格式优雅。
+- 注释必须是完整的句子，以需要注释的内容作为开头，句点作为结尾，格式为 // 名称 描述。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+    // logs the flags in the flagset.
+    func PrintFlags(flags *pflag.FlagSet) {
+       // normal code
+    }
+
+  ```
+
+    </td><td>
+
+  ```go
+
+    // PrintFlags logs the flags in the flagset.
+    func PrintFlags(flags *pflag.FlagSet) {
+      // normal code
+    }
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+
+- 所有注释掉的代码在提交 code review 前都应该被删除，否则应该说明为什么不删除，并给出后续处理建议。
+- 在多段注释之间可以使用空行分隔加以区分，如下所示：
+
+  ```go
+
+  // Package superman implements methods for saving the world.
+  //
+  // Experience has shown that a small number of procedures can prove
+  // helpful when attempting to save the world.
+  package superman
+
+  ```
+
+### 包注释
+
+- 每个包都有且仅有一个包级别的注释。
+- 包注释统一用 // 进行注释，格式为 // Package 包名 包描述，例如：
+
+  ```go
+
+  // Package genericclioptions contains flags which can be added to you command, bound, completed, and produce
+  // useful helper functions.
+  package genericclioptions
+
+  ```
+
+### 变量 / 常量注释
+
+- 每个可导出的变量 / 常量都必须有注释说明，格式为// 变量名 变量描述，例如：
+
+  ```go
+
+  // ErrSigningMethod defines invalid signing method error.
+  var ErrSigningMethod = errors.New("Invalid signing method")
+
+  ```
+
+- 出现大块常量或变量定义时，可在前面注释一个总的说明，然后在每一行常量的前一行或末尾详细注释该常量的定义，例如：
+
+  ```go
+
+
+  // Code must start with 1xxxxx.
+  const (
+      // ErrSuccess - 200: OK.
+      ErrSuccess int = iota + 100001
+
+      // ErrUnknown - 500: Internal server error.
+      ErrUnknown
+
+      // ErrBind - 400: Error occurred while binding the request body to the struct.
+      ErrBind
+
+      // ErrValidation - 400: Validation failed.
+      ErrValidation
+  )
+
+  ```
+
+### 结构体注释
+
+- 每个需要导出的结构体或者接口都必须有注释说明，格式为 // 结构体名 结构体描述。
+- 结构体内的可导出成员变量名，如果意义不明确，必须要给出注释，放在成员变量的前一行或同一行的末尾。例如：
+
+  ```go
+
+  // User represents a user restful resource. It is also used as gorm model.
+  type User struct {
+      // Standard object's metadata.
+      metav1.ObjectMeta `json:"metadata,omitempty"`
+
+      Nickname string `json:"nickname" gorm:"column:nickname"`
+      Password string `json:"password" gorm:"column:password"`
+      Email    string `json:"email" gorm:"column:email"`
+      Phone    string `json:"phone" gorm:"column:phone"`
+      IsAdmin  int    `json:"isAdmin,omitempty" gorm:"column:isAdmin"`
+  }
+
+  ```
+
+### 方法注释
+
+- 每个需要导出的函数或者方法都必须有注释，格式为// 函数名 函数描述，例如：
+
+  ```go
+
+  // BeforeUpdate run before update database record.
+  func (p *Policy) BeforeUpdate() (err error) {
+    // normal code
+    return nil
+  }
+
+  ```
+
+### 类型注释
+
+- 每个需要导出的类型定义和类型别名都必须有注释说明，格式为 // 类型名 类型描述。例如：
+
+  ```go
+
+  // Code defines an error code type.
+  type Code int
+
+  ```
+
 ## 数据类型使用规范
+
+### 字符串
+
+- 空字符串判断应使用 len。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+    if s == "" {
+      // normal code
+    }
+
+  ```
+
+    </td><td>
+
+  ```go
+
+    if len(s) == 0 {
+      // normal code
+    }
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+
+- 复杂字符串使用 raw 字符串避免字符转义。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+    regexp.MustCompile("\\.")
+
+  ```
+
+    </td><td>
+
+  ```go
+
+    regexp.MustCompile(`\.`)
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+- 字符串 string format。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+  msg := "unexpected values %v, %v\n"
+  fmt.Printf(msg, 1, 2)
+
+  ```
+
+    </td><td>
+
+  ```go
+
+  const msg = "unexpected values %v, %v\n"
+  fmt.Printf(msg, 1, 2)
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+### 切片
+
+- 空 slice（map、channel） 判断。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+    if len(slice) = 0 {
+      // normal code
+    }
+
+  ```
+
+    </td><td>
+
+  ```go
+
+    if slice != nil && len(slice) == 0 {
+      // normal code
+    }
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+
+- 声明 slice。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+    s := []string{}
+    s := make([]string, 0)
+
+  ```
+
+    </td><td>
+
+  ```go
+
+    var s []string
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+
+- slice 复制。
+   <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+  var b1, b2 []byte
+  for i, v := range b1 {
+    b2[i] = v
+  }
+  for i := range b1 {
+    b2[i] = b1[i]
+  }
+
+  ```
+
+    </td><td>
+
+  ```go
+
+    copy(b2, b1)
+
+
+
+
+
+
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+
+- slice 新增。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+  var a, b []int
+  for _, v := range a {
+    b = append(b, v)
+  }
+
+  ```
+
+    </td><td>
+
+  ```go
+
+    var a, b []int
+    b = append(b, a...)
+
+
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+
+- 返回 slice。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+  if x == "" {
+    return []int{}
+  }
+
+  ```
+
+    </td><td>
+
+  ```go
+
+  if x == "" {
+    return nil
+  }
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+
+### 结构体
+
+- struct 以多行格式初始化。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+  type user struct {
+    Id   int64
+    Name string
+  }
+
+  u1 := user{100, "Colin"}
+
+
+
+
+  ```
+
+    </td><td>
+
+  ```go
+
+  type user struct {
+    Id   int64
+    Name string
+  }
+
+  u2 := user{
+      Id:   200,
+      Name: "Lex",
+  }
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
 
 ## 控制结构
 
+### if
+
+- if 接受初始化语句，约定如下方式建立局部变量。
+
+  ```go
+
+    if err := loadConfig(); err != nil {
+      // error handling
+      return err
+    }
+
+  ```
+
+- 对于 bool 类型的变量，应直接进行真假判断。
+
+  ```go
+
+    var isAllow bool
+    if isAllow {
+      // normal code
+    }
+
+  ```
+
+### for
+
+- 应采用短声明建立局部变量。
+
+  ```go
+
+    sum := 0
+    for i := 0; i < 10; i++ {
+        sum += 1
+    }
+
+  ```
+
+- 不要在 for 循环里面使用 defer，defer 只有在函数退出时才会执行。
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+  for file := range files {
+    fd, err := os.Open(file)
+    if err != nil {
+      return err
+    }
+    defer fd.Close()
+    // normal code
+  }
+
+
+
+  ```
+
+    </td><td>
+
+  ```go
+
+  for file := range files {
+    func() {
+      fd, err := os.Open(file)
+      if err != nil {
+        return err
+      }
+      defer fd.Close()
+      // normal code
+    }()
+  }
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
+
+### range
+
+- 如果只需要第一项（key），就丢弃第二个。
+
+  ```go
+
+  for key := range keys {
+  // normal code
+  }
+
+  ```
+
+- 如果只需要第二项，把第一项置为下划线。
+
+  ```go
+
+  sum := 0
+  for _, value := range array {
+      sum += value
+  }
+  ```
+
+### switch
+
+- 必须要有 default。
+
+  ```go
+
+  switch os := runtime.GOOS; os {
+      case "linux":
+          fmt.Println("Linux.")
+      case "darwin":
+          fmt.Println("OS X.")
+      default:
+          fmt.Printf("%s.\n", os)
+  }
+
+  ```
+
+### goto
+
+- 业务代码禁止使用 goto 。
+- 框架或其他底层源码尽量不用。
+
 ## 函数规范
+
+- 函数分组与顺序
+  - 函数应按粗略的调用顺序排序。
+  - 同一文件中的函数应按接收者分组。
+
+### 函数参数
+
+- 如果函数返回相同类型的两个或三个参数，或者如果从上下文中不清楚结果的含义，使用命名返回，其他情况不建议使用命名返回，例如：
+
+  ```go
+
+  func coordinate() (x, y float64, err error) {
+    // normal code
+  }
+
+  ```
+
+- 传入变量和返回变量都以小写字母开头。
+- 尽量用值传递，非指针传递。
+- 参数数量均不能超过 5 个，必要时可以考虑使用 struct。
+- 多返回值最多返回三个，超过三个请使用 struct。
+- 传入参数是 map、slice、chan、interface ，不要传递指针。
+
+### defer
+
+- 当存在资源创建时，应紧跟 defer 释放资源。
+- 先判断是否错误，再 defer 释放资源，例如：
+
+  ```go
+
+  rep, err := http.Get(url)
+  if err != nil {
+      return err
+  }
+
+  defer resp.Body.Close()
+
+  ```
+
+### 方法的接收器
+
+- 推荐以类名第一个英文首字母的小写作为接收器的命名。
+- 接收器的命名在函数超过 20 行的时候不要用单字符。
+- 接收器的命名不能采用 me、this、self 这类易混淆名称。
+
+### 嵌套
+
+- 嵌套深度不能超过 4 层。
+
+### 变量命名
+
+- 变量声明尽量放在变量第一次使用的前面，遵循就近原则。
+- 禁止使用魔法数字，应改用一个常量代替，例如：
+
+  ```go
+
+  // PI ...
+  const Prise = 3.14
+
+  func getAppleCost(n float64) float64 {
+    return Prise * n
+  }
+
+  func getOrangeCost(n float64) float64 {
+    return Prise * n
+  }
+
+  ```
