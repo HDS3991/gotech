@@ -2,9 +2,14 @@
 
 Go Backend Technique Collection!
 
-## Go
+## 编程规范
 
-| #   | 题目                          | 题解                                                                                                                                                                                                                                                                             |     |
-| --- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| 1   | Golang 常用的设计模式有哪些？ | [Function Options](./go/designPattern/option/functionOption.go)、[访问者模式](./go/designPattern/visitor/visitor.go) 、[生成器模式](./go/designPattern/builder/builder.go)、[抽象工厂模式](./go/designPattern/factory/factory.go)、[Loader](./go/designPattern/loader/loader.go) | -   |
-| 2   | 简单介绍一下 GMP 模型         |                                                                                                                                                                                                                                                                                  | -   |
+## 设计模式
+
+| #   | 设计模式                                                | 参考                                                                                        |
+| --- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 1   | [builder](./designpattern/builder/builder.go)           | [Refactoring.Guru](https://refactoringguru.cn/design-patterns/builder/go/example#example-0) |
+| 2   | [factory](./designpattern/factory/factory.go)           | [Refactoring.Guru](https://refactoring.guru/design-patterns/factory-method)                 |
+| 3   | [loader](./designpattern/loader/loader.go)              | -                                                                                           |
+| 4   | [func option](./designpattern/option/functionOption.go) | [CoolShell](https://coolshell.cn/articles/21146.html)                                       |
+| 5   | [vistor](./designpattern/visitor/visitor.go)            | [CoolShell](https://coolshell.cn/articles/21263.html)                                       |
