@@ -929,6 +929,7 @@
     </td></tr>
     </tbody>
   </table>
+
 - 字符串 string format。
   <table>
     <thead>
@@ -956,6 +957,7 @@
     </td></tr>
     </tbody>
   </table>
+
 ### 切片
 
 - 空 slice（map、channel） 判断。
@@ -1184,6 +1186,41 @@
     }
 
   ```
+
+- 能够用正向逻辑判断应尽量使用正向逻辑判断。
+
+  <table>
+    <thead>
+      <tr><th>Bad</th><th>Good</th></tr>
+    </thead>
+    <tbody>
+    <tr><td>
+
+  ```go
+
+  var a, b int
+  var cond
+  if a != cond && b != cond {
+    //...
+  }
+
+  ```
+
+    </td><td>
+
+  ```go
+
+  var a, b int
+  var cond
+  if a == cond && b == cond {
+    //....
+  }
+
+  ```
+
+    </td></tr>
+    </tbody>
+  </table>
 
 ### for
 
